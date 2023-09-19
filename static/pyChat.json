@@ -1,0 +1,241 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Simple ChatBot API",
+    "description": "This is a simple API to call Bot Services",
+    "contact": {
+      "email": "stagiaire@your-company.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://virtserver.swaggerhub.com/LCS9/pyChat/1.0.0",
+      "description": "SwaggerHub API Auto Mocking"
+    },
+    {
+      "url": "https://localhost:5000/pyChat/1.0.0",
+      "description": "SwaggerHub API Auto Mocking"
+    }
+  ],
+  "tags": [
+    {
+      "name": "admin",
+      "description": "Secured prompt designers-only calls"
+    },
+    {
+      "name": "developers",
+      "description": "Operations available to regular developers"
+    }
+  ],
+  "paths": {
+    "/definition/api-docs": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Open API (aka swagger) yaml file",
+        "description": "Service OAS Yaml file\n",
+        "operationId": "getYaml",
+        "responses": {
+          "200": {
+            "description": "search results matching criteria"
+          }
+        }
+      }
+    },
+    "/model": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "searches models",
+        "description": "List the openAI models\n",
+        "operationId": "searchInventory",
+        "parameters": [
+          {
+            "name": "searchString",
+            "in": "query",
+            "description": "pass an optional search string for looking up inventory",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "number of records to skip for pagination",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "maximum number of records to return",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 50,
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "search results matching criteria"
+          },
+          "400": {
+            "description": "bad input parameter"
+          }
+        }
+      }
+    },
+    "/dialogue": {
+      "post": {
+        "tags": [
+          "developers"
+        ],
+        "summary": "start a dialogue with ChatGPT Bot",
+        "description": "Create Chat message completion",
+        "operationId": "addCompletion",
+        "requestBody": {
+          "description": "prompt message to send",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "GPT completion created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input, object invalid"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MessageItem": {
+        "required": [
+          "content",
+          "engine",
+          "role",
+          "temperature",
+          "tokens"
+        ],
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "example": "user"
+          },
+          "content": {
+            "type": "string",
+            "example": "Hello ChatGPT"
+          },
+          "temperature": {
+            "type": "string",
+            "example": "O"
+          },
+          "tokens": {
+            "type": "integer",
+            "example": 250
+          },
+          "provider": {
+            "$ref": "#/components/schemas/Provider"
+          }
+        }
+      },
+      "ResponseItem": {
+        "required": [
+          "content",
+          "role",
+          "usage"
+        ],
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "example": "assistant"
+          },
+          "content": {
+            "type": "string",
+            "example": "What can I do for you ?' usage: $ref: "
+          }
+        }
+      },
+      "Provider": {
+        "required": [
+          "deployment"
+        ],
+        "type": "object",
+        "properties": {
+          "deployment": {
+            "type": "string",
+            "example": "gpt35-turbo-deployment"
+          },
+          "api_base": {
+            "type": "string",
+            "format": "url",
+            "example": "https://openai-sandbox-gs.openai.azure.com"
+          },
+          "api-version": {
+            "type": "string",
+            "example": "2023-05-15"
+          }
+        }
+      },
+      "Usage": {
+        "required": [
+          "completion_tokens",
+          "prompt_tokens",
+          "total_tokens"
+        ],
+        "type": "object",
+        "properties": {
+          "completion_tokens": {
+            "type": "integer",
+            "example": 150
+          },
+          "prompt_tokens": {
+            "type": "integer",
+            "example": 10
+          },
+          "total_tokens": {
+            "type": "integer",
+            "example": 200
+          }
+        }
+      }
+    }
+  }
+}
